@@ -11,7 +11,7 @@ conveniences that most command line scripts should have such as:
 
 This library is mostly a wrapper over the excellent Symfony Console library, but
 with added functionality that doesn't exist in the Console library such as
-logging, email notifications, and a timer.
+logging, email notifications, and a execution timer.
 
 ## What is the purpose?
 The purpose is to simplify creation of command line scripts
@@ -37,11 +37,11 @@ configure()
 // Code to execute
 executeCommand()
 
-// Any input validation code you want
+// Any input validation code you want.  Should return boolean
 checkValidInput()
 
 // The path to a configuration file if you want to use logging and email
-// notifications
+// notifications.  Should return a string
 getConfigPath()
 ```
 
