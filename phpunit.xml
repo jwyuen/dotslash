@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit stopOnFailure="true" bootstrap="bootstrap.php">
+  <filter>
+    <whitelist>
+      <directory suffix=".php">tests</directory>
+    </whitelist>
+  </filter>
+	<testsuites>
+		<testsuite name="complete">
+      <directory suffix=".php">tests</directory>
+		</testsuite>
+	</testsuites>
+</phpunit>
