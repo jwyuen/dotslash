@@ -1,90 +1,76 @@
-# Configee for PHP! 
+# Dotslash (for PHP) 
 
 ## What is it?
-A php library that you can add to any project to help you manage
-application specific php config files, such as database connection parameters.
-For example, if you were creating a PHP framework, you'd want anyone using your
-project to be able to define their own config parameters for connecting to their
-own database.
+A php library that allows you to make command line scripts quickly in PHP with
+conveniences that most command line scripts should have such as: 
+- logging
+- email notifications on failure
+- easy way to take in and parse command line options
+- execution timer
+- nice looking console output
+
+This library is mostly a wrapper over the excellent Symfony Console library, but
+with added functionality that doesn't exist in the Console library such as
+logging, email notifications, and a timer.
 
 ## What is the purpose?
-The purpose is to have a dead simple interface for setting and getting
-configuration parameters by only having to define config files.
+The purpose is to simplify creation of command line scripts
 
 ## Install
 Just add to your composer.json like:
 ```json
 {
   "require": {
-    "jwyuen/configee-php": "1.1"
+    "jwyuen/dotslash": "1.0"
   }
 }
 ``` 
 
 ## Usage
-Instantiate the main class wherever you need to use your configuration 
-parameters, such as a bootstrap file.
+Create a class that extends the \Dotslash\BaseCommand class.  Your class should
+extend the following functions:
+
 ```php
-$configee = new \Configee\Configee('your/config/path');
-$config = $configee->getConfig();
+// See: http://symfony.com/doc/current/components/console/introduction.html
+configure()
+
+// Code to execute
+executeCommand()
+
+// Any input validation code you want
+checkValidInput()
+
+// The path to a configuration file if you want to use logging and email
+// notifications
+getConfigPath()
 ```
 
-## Config Parsing Structure
-Configee can handle an n-deep directory structure if you so choose to nest your 
-configs like so.  The only requirement is that your config files are php files 
-and return an array.
+You'll then need an entry point script from which you'll run your command line
+script.  An example is located in sample/console.php
 
-For example, consider the following directory structure:
+## Config Structure
+If you decide you want to enable logging and email functionality, you'll need to
+create a config file with the following contents/structure:
 
-```
-configroot
-\- db
- |- mysql.php
- \- AnEmptyFolder
-\-general.php
-```
 
-Contents of mysql.php:
-```php
-<?php
-
-return array(
-  'host' => 'localhost',
-  'user' => 'amysqluser',
-  'password' => 'apassword',
-);
-```
-
-Contents of general.php
+Example config.php:
 ```php
 <?php
 
 return array(
-  'use_cookies' => true,
-  'aconfigoption' => 1,
-);
-```
-
-Given the above, you'll get a config structure like so:
-```php
-array(
-  "db" => array(
-    "mysql" => array(
-      "host" => "localhost",
-      "user" => "amysqluser",
-      "password" => "apassword"
-    )
+  'ses-email' => array(
+    'aws-access-key' => '<your_access_key_here>',
+    'aws-secret-key' => '<your_secret_key_here>',
+    'region' => 'us-east-1',
+    'email-recipient' => 'dev@dev.com'
   ),
-  "general" => array(
-    "use_cookies" => true,
-    "aconfigoption" => 1
+  'logging' => array(
+    'log-directory' => '/home/user/logs/'
   )
-)
+);
 ```
 
-## Important PSA
-If you decide to store sensitive credentials in your config(s), make sure to set
-proper permissions on them to make sure not just anyone can look at them!  E.g.
-```
-chmod 640 <your-config-file>
-```
+As you can tell from the example config, you'll need an AWS account to send
+emails via Simple Email Service.  There may be support for other email options
+in the future.
+
