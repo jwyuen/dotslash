@@ -118,7 +118,7 @@ abstract class BaseCommand extends Command {
 
   private function initializeEmailer() {
     if (isset($this->config) && !isset($this->emailer)) {
-      $this->emailer = new Emailer($this->config);
+      $this->emailer = new \Dotslash\Utils\Emailer($this->config);
     }
   }
 
