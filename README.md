@@ -41,7 +41,8 @@ executeCommand()
 checkValidInput()
 
 // The path to a configuration file if you want to use logging and email
-// notifications.  Should return a string
+// notifications.  Should return a string if you have a config, or null if you
+// don't want to use logging and email functionality
 getConfigPath()
 ```
 
