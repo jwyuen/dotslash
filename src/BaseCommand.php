@@ -42,7 +42,7 @@ abstract class BaseCommand extends Command {
     $this->config = $config;
     
     if ($this->getConfigPath() !== null) {
-      $this->config = new Config($configPath);
+      $this->config = new Config($this->getConfigPath());
     }
 
     // For DI for testing
