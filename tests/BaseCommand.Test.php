@@ -154,7 +154,49 @@ class BaseCommandTest extends \PHPUnit_Framework_TestCase {
 
     }
   }
+  
+  public function 
+    test_command_doesntSendFailureNotificationEmail_OnException_WhenDisabled() {
+    $emailRecipient = 'devo@devo.com';
 
+    // Stub config
+    $stubConfig = $this->getMockBuilder('Dotslash\Config') 
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $stubConfig->expects($this->any())
+      ->method('getEmailSesConfig')
+      ->will($this->returnValue(array('email-recipient' => $emailRecipient)));
+
+    // Mock emailer
+    $mockEmailer = $this->getMockBuilder('Dotslash\Utils\Emailer')
+      ->setMethods(array('email'))
+      ->disableOriginalConstructor()
+      ->getMock();
+
+
+    $mockEmailer->expects($this->never())
+      ->method('email');
+    
+    $application = new Application();
+    $application->add(new TestSendFailureNotificationEmailCommand(
+      null, $mockEmailer, $stubConfig
+    ));
+    $command = $application->find(
+      TestSendFailureNotificationEmailCommand::$commandName
+    );
+    $command->disableEmailer();
+
+    $commandTester = new CommandTester($command);
+    try {
+      $commandTester->execute(
+        array('command' => $command->getName())
+      );
+      $this->fail('Exception supposed to be thrown but none thrown!');
+    } catch (\Exception $e) {
+
+    }
+  }
 
 
 }

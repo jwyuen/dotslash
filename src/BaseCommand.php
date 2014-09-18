@@ -30,6 +30,8 @@ abstract class BaseCommand extends Command {
   private $emailer = null;
   private $config = null;
 
+  private $disableEmailer = false;
+
   protected $output;
   protected $input;
   protected $dialog;
@@ -116,10 +118,14 @@ abstract class BaseCommand extends Command {
     }
   }
 
-  private function initializeEmailer() {
+  public function initializeEmailer() {
     if (isset($this->config) && !isset($this->emailer)) {
       $this->emailer = new \Dotslash\Utils\Emailer($this->config);
     }
+  }
+
+  public function disableEmailer() {
+    $this->disableEmailer = true;
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
@@ -133,7 +139,9 @@ abstract class BaseCommand extends Command {
       $time = $timeEnd - $this->timeStart;
       $this->writeOutput('Script execution took ' . $time . ' seconds.');
     } catch (\Exception $e) {
-      $this->sendFailureNotificationEmail($e->getTraceAsString());
+      if (!$this->disableEmailer) {
+        $this->sendFailureNotificationEmail($e->getTraceAsString());
+      }
       throw $e;
     }
   }
