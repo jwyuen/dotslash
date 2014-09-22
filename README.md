@@ -21,7 +21,7 @@ Just add to your composer.json like:
 ```json
 {
   "require": {
-    "jwyuen/dotslash": "v0.2"
+    "jwyuen/dotslash": "0.*"
   }
 }
 ``` 
