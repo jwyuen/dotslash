@@ -48,6 +48,35 @@ class TestSendFailureNotificationEmailCommand extends TestGoodBaseCommand {
 
 }
 
+class TestGoodBaseCommandWithInvalidUserInputString extends TestBaseCommand {
+  static $commandName = 'testCommand4';
+  protected function configure() {
+    $this
+      ->setName(self::$commandName)
+      ->setDescription('Test');
+  }
+
+  protected function checkValidInput() {
+    return 'This is a message for a specific user input failing';
+  }
+
+  protected function executeCommand() {}
+}
+
+class TestGoodBaseCommandWithBadUserInputReturnsFalse extends TestBaseCommand {
+  static $commandName = 'testCommand5';
+  protected function configure() {
+    $this
+      ->setName(self::$commandName)
+      ->setDescription('Test');
+  }
+
+  protected function checkValidInput() {
+    return false;
+  }
+
+  protected function executeCommand() {}
+}
 
 class BaseCommandTest extends \PHPUnit_Framework_TestCase {
 
@@ -197,6 +226,82 @@ class BaseCommandTest extends \PHPUnit_Framework_TestCase {
 
     }
   }
+  
+  public function 
+    test_command_throwsExceptionOnFailedUserInputWithUserDefinedMessage() {
 
+    // Stub config
+    $stubConfig = $this->getMockBuilder('Dotslash\Config') 
+      ->disableOriginalConstructor()
+      ->getMock();
 
+    $stubConfig->expects($this->any())
+      ->method('getEmailSesConfig')
+      ->will($this->returnValue(array('email-recipient' => '')));
+
+    // Mock emailer
+    $stubEmailer = $this->getMockBuilder('Dotslash\Utils\Emailer')
+      ->setMethods(array('email'))
+      ->disableOriginalConstructor()
+      ->getMock();
+    
+    $application = new Application();
+    $application->add(new TestGoodBaseCommandWithInvalidUserInputString(
+      null, $stubEmailer, $stubConfig
+    ));
+    $command = $application->find(
+      TestGoodBaseCommandWithInvalidUserInputString::$commandName
+    );
+    $command->disableEmailer();
+
+    $commandTester = new CommandTester($command);
+    try {
+      $commandTester->execute(
+        array('command' => $command->getName())
+      );
+      $this->fail('Exception supposed to be thrown but none thrown!');
+    } catch (\Exception $e) {
+      $this->assertEquals('This is a message for a specific user input failing',
+        $e->getMessage());
+    }
+  }
+  
+  public function 
+    test_command_throwsExceptionOnFailedUserInputWithDefaultMessage() {
+
+    // Stub config
+    $stubConfig = $this->getMockBuilder('Dotslash\Config') 
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $stubConfig->expects($this->any())
+      ->method('getEmailSesConfig')
+      ->will($this->returnValue(array('email-recipient' => '')));
+
+    // Mock emailer
+    $stubEmailer = $this->getMockBuilder('Dotslash\Utils\Emailer')
+      ->setMethods(array('email'))
+      ->disableOriginalConstructor()
+      ->getMock();
+    
+    $application = new Application();
+    $application->add(new TestGoodBaseCommandWithBadUserInputReturnsFalse(
+      null, $stubEmailer, $stubConfig
+    ));
+    $command = $application->find(
+      TestGoodBaseCommandWithBadUserInputReturnsFalse::$commandName
+    );
+    $command->disableEmailer();
+
+    $commandTester = new CommandTester($command);
+    try {
+      $commandTester->execute(
+        array('command' => $command->getName())
+      );
+      $this->fail('Exception supposed to be thrown but none thrown!');
+    } catch (\Exception $e) {
+      $this->assertEquals('Invalid user input!', $e->getMessage());
+    }
+  }
+  
 }

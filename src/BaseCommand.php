@@ -40,7 +40,6 @@ abstract class BaseCommand extends Command {
   public function __construct($logger = null, $emailer = null, $config = null) {
     parent::__construct();
     
-    $this->initializeErrorHandling();
     $this->config = $config;
     
     if ($this->getConfigPath() !== null) {
@@ -59,6 +58,8 @@ abstract class BaseCommand extends Command {
     } else {
       $this->initializeEmailer();
     }
+
+    $this->initializeErrorHandling();
   }
 
   /*
@@ -131,8 +132,14 @@ abstract class BaseCommand extends Command {
   protected function execute(InputInterface $input, OutputInterface $output) {
     try {
       $this->runTimeInitialization($input, $output);
-      if ($this->checkValidInput()) {
+
+      $validUserInput = $this->checkValidInput();
+      if ($validUserInput === true) {
         $this->executeCommand();
+      } else if ($validUserInput === false) {
+        throw new \Exception('Invalid user input!');
+      } else {
+        throw new \Exception($validUserInput);
       }
 
       $timeEnd = microtime(true);
@@ -140,7 +147,10 @@ abstract class BaseCommand extends Command {
       $this->writeOutput('Script execution took ' . $time . ' seconds.');
     } catch (\Exception $e) {
       if (!$this->disableEmailer) {
-        $this->sendFailureNotificationEmail($e->getTraceAsString());
+        $this->sendFailureNotificationEmail(
+          'Exception: ' . $e->getMessage() . 
+          ' - Stack Trace: ' . $e->getTraceAsString()
+        );
       }
       throw $e;
     }
@@ -152,7 +162,6 @@ abstract class BaseCommand extends Command {
       $body = $message;
       $emailConfig = $this->config->getEmailSesConfig();
       $to = $emailConfig['email-recipient'];
-      //$to = 'james.yuen@brooklynmuseum.org';
       $this->emailer->email($subject, $body, $to);
     }
   }
@@ -182,7 +191,7 @@ abstract class BaseCommand extends Command {
    * Must be overriden.
    *
    * Checks the user's input to see if it's valid.  Should return true if the 
-   * input is valid, false if the input is invalid
+   * input is valid, false or a message string detailing which user input failed
    */
   protected abstract function checkValidInput();
 
