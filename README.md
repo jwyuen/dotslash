@@ -37,7 +37,9 @@ configure()
 // Code to execute
 executeCommand()
 
-// Any input validation code you want.  Should return boolean
+// Any input validation code you want.  Should return boolean, or optionally a
+// custom string with the failure message you specify (only in the case of user
+// input failing).  If validation passes, this should always return true.
 checkValidInput()
 
 // The path to a configuration file if you want to use logging and email
