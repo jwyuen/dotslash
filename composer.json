@@ -19,7 +19,7 @@
     "aws/aws-sdk-php": "2.*",
     "monolog/monolog": "1.10.*",
     "jwyuen/configee-php": "v1.2",
-    "symfony/console": "2.3.*",
+    "symfony/console": "2.*",
     "symfony/event-dispatcher": "2.3.*"
   },
   "require-dev": {
