@@ -8,29 +8,31 @@ use Aws\Credentials\Credentials;
 class Emailer {
 
   private $sesClient;
+  private $sesConfig;
 
   public function __construct($config, $sesClient = null) {
+
     $this->sesClient = $sesClient;
+    $this->sesConfig = $config->getEmailSesConfig();
 
     if (is_null($this->sesClient)) {
 
-      $sesConfig = $config->getEmailSesConfig();
-
-      if (!isset($sesConfig['aws-access-key']) || !isset($sesConfig['aws-secret-key']) ||
-        !isset($sesConfig['region'])) {
+      if (!isset($this->sesConfig['aws-access-key']) ||
+        !isset($this->sesConfig['aws-secret-key']) ||
+        !isset($this->sesConfig['region'])) {
 
         throw new \Exception('Unable to initiate Emailer due to missing ' .
           'configuration variables.  Please check your config.');
       }
 
       $credentials = new Credentials(
-        $sesConfig['aws-access-key'], $sesConfig['aws-secret-key']
+        $this->sesConfig['aws-access-key'], $this->sesConfig['aws-secret-key']
       );
 
 
       $this->sesClient = new SesClient(array(
         'credentials' => $credentials,
-        'region' => $sesConfig['region'],
+        'region' => $this->sesConfig['region'],
         'version' => '2010-12-01'
       ));
     }
@@ -56,7 +58,7 @@ class Emailer {
     }
 
     if (!isset($from)) {
-      $from = WEBMASTER_EMAIL;
+      $from = $this->sesConfig['email-recipient'];
     }
 
     $args = array(
