@@ -53,10 +53,10 @@ script.  An example is located in sample/console.php
 
 ## Config Structure
 If you decide you want to enable logging and email functionality, you'll need to
-create a config file with the following contents/structure:
+create a config file with the following name and contents/structure:
 
 
-Example config.php:
+Example dotslash-config.php:
 ```php
 <?php
 
