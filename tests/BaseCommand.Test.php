@@ -81,7 +81,7 @@ class TestGoodBaseCommandWithBadUserInputReturnsFalse extends TestBaseCommand {
 class BaseCommandTest extends \PHPUnit_Framework_TestCase {
 
   public function testCommandUndefinedConfigure_ShouldThrowException() {
-    
+
     $application = new Application();
     try {
       $application->add(new TestBaseCommandUndefinedConfigure());
@@ -91,11 +91,11 @@ class BaseCommandTest extends \PHPUnit_Framework_TestCase {
   }
 
   public function testCommandUndefinedExecuteCommand_ShouldThrowException() {
-    
+
     $application = new Application();
-    
+
     try {
-      
+
       $application->add(new TestBaseCommandUndefinedExecuteCommand());
       $this->fail('An expected exception was not thrown!');
     }
@@ -103,7 +103,7 @@ class BaseCommandTest extends \PHPUnit_Framework_TestCase {
   }
 
   public function testGoodCommand_ShouldNotThrowException() {
-    
+
     $application = new Application();
     $application->add(new TestGoodBaseCommand());
     $command = $application->find(TestGoodBaseCommand::$commandName);
@@ -118,9 +118,9 @@ class BaseCommandTest extends \PHPUnit_Framework_TestCase {
       $this->fail('An unexpected exception was thrown!');
     }
   }
-  
+
   public function testGoodCommand_ShouldHaveCorrectOutput() {
-    
+
     $application = new Application();
     $application->add(new TestGoodBaseCommand());
     $command = $application->find(TestGoodBaseCommand::$commandName);
@@ -128,7 +128,7 @@ class BaseCommandTest extends \PHPUnit_Framework_TestCase {
     $commandTester->execute(
       array('command' => $command->getName())
     );
-    
+
     $className = get_class(new TestGoodBaseCommand());
     $expectedOutputLine1 = '-------------------------------------------------';
     $expectedOutputLine2 = 'Beginning execution of ' . $className . ' script:';
@@ -142,7 +142,7 @@ class BaseCommandTest extends \PHPUnit_Framework_TestCase {
     $emailRecipient = 'devo@devo.com';
 
     // Stub config
-    $stubConfig = $this->getMockBuilder('Dotslash\Config') 
+    $stubConfig = $this->getMockBuilder('Dotslash\Config')
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -160,11 +160,11 @@ class BaseCommandTest extends \PHPUnit_Framework_TestCase {
     $mockEmailer->expects($this->once())
       ->method('email')
       ->with(
-        $this->anything(), 
-        $this->anything(), 
+        $this->anything(),
+        $this->anything(),
         $this->equalTo($emailRecipient)
       );
-    
+
     $application = new Application();
     $application->add(new TestSendFailureNotificationEmailCommand(
       null, $mockEmailer, $stubConfig
@@ -183,8 +183,8 @@ class BaseCommandTest extends \PHPUnit_Framework_TestCase {
 
     }
   }
-  
-  public function 
+
+  public function
     test_command_doesntSendFailureNotificationEmail_OnException_WhenDisabled() {
     $emailRecipient = 'devo@devo.com';
 
@@ -206,7 +206,7 @@ class BaseCommandTest extends \PHPUnit_Framework_TestCase {
 
     $mockEmailer->expects($this->never())
       ->method('email');
-    
+
     $application = new Application();
     $application->add(new TestSendFailureNotificationEmailCommand(
       null, $mockEmailer, $stubConfig
@@ -226,8 +226,8 @@ class BaseCommandTest extends \PHPUnit_Framework_TestCase {
 
     }
   }
-  
-  public function 
+
+  public function
     test_command_throwsExceptionOnFailedUserInputWithUserDefinedMessage() {
 
     // Stub config
@@ -244,7 +244,7 @@ class BaseCommandTest extends \PHPUnit_Framework_TestCase {
       ->setMethods(array('email'))
       ->disableOriginalConstructor()
       ->getMock();
-    
+
     $application = new Application();
     $application->add(new TestGoodBaseCommandWithInvalidUserInputString(
       null, $stubEmailer, $stubConfig
@@ -265,12 +265,12 @@ class BaseCommandTest extends \PHPUnit_Framework_TestCase {
         $e->getMessage());
     }
   }
-  
-  public function 
+
+  public function
     test_command_throwsExceptionOnFailedUserInputWithDefaultMessage() {
 
     // Stub config
-    $stubConfig = $this->getMockBuilder('Dotslash\Config') 
+    $stubConfig = $this->getMockBuilder('Dotslash\Config')
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -283,7 +283,7 @@ class BaseCommandTest extends \PHPUnit_Framework_TestCase {
       ->setMethods(array('email'))
       ->disableOriginalConstructor()
       ->getMock();
-    
+
     $application = new Application();
     $application->add(new TestGoodBaseCommandWithBadUserInputReturnsFalse(
       null, $stubEmailer, $stubConfig
@@ -303,5 +303,5 @@ class BaseCommandTest extends \PHPUnit_Framework_TestCase {
       $this->assertEquals('Invalid user input!', $e->getMessage());
     }
   }
-  
+
 }

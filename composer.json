@@ -16,7 +16,7 @@
   }],
   "require": {
     "php": ">=5.3.0",
-    "aws/aws-sdk-php": "2.*",
+    "aws/aws-sdk-php": "3.*",
     "monolog/monolog": "1.*",
     "jwyuen/configee-php": "v1.2",
     "symfony/console": "2.*",

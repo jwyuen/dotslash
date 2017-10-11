@@ -3,10 +3,10 @@
 namespace Dotslash\Utils;
 
 use Aws\Ses\SesClient;
-use Aws\Common\Aws;
+use Aws\Credentials\Credentials;
 
 class Emailer {
-  
+
   private $sesClient;
 
   public function __construct($config, $sesClient = null) {
@@ -16,43 +16,40 @@ class Emailer {
 
       $sesConfig = $config->getEmailSesConfig();
 
-      if (!isset($sesConfig['aws-access-key']) || 
-        !isset($sesConfig['aws-secret-key']) ||
+      if (!isset($sesConfig['aws-access-key']) || !isset($sesConfig['aws-secret-key']) ||
         !isset($sesConfig['region'])) {
 
-        throw new \Exception('Unable to initiate Emailer due to missing ' . 
+        throw new \Exception('Unable to initiate Emailer due to missing ' .
           'configuration variables.  Please check your config.');
       }
-      
-      $aws = Aws::factory(array(
-        'ses' => array(
-          'alias' => 'Ses',
-          'class' => 'Aws\Ses\SesClient',
-          'extends' => 'default_settings'
-        ),
-        'key' => $sesConfig['aws-access-key'],
-        'secret' => $sesConfig['aws-secret-key'],
-        'region' => $sesConfig['region']
-      ))->enableFacades('ses');
 
-      $this->sesClient = $aws->get('ses');
+      $credentials = new Credentials(
+        $sesConfig['aws-access-key'], $sesConfig['aws-secret-key']
+      );
+
+
+      $this->sesClient = new SesClient(array(
+        'credentials' => $credentials,
+        'region' => $sesConfig['region'],
+        'version' => '2010-12-01'
+      ));
     }
   }
-  
-	public function email($subject, $body, $to, $from = null) {
-    $args = $this->createSesSendEmailParameterObject($subject, $body, $to, 
-      $from);
+
+  public function email($subject, $body, $to, $from = null) {
+    $args = $this->createSesSendEmailParameterObject(
+      $subject, $body, $to, $from
+    );
 
     $this->sesClient->sendEmail($args);
   }
 
   /*
-   * This is a function to simplify the sending of emails using the AWS SDK.  
-   * For more advanced options, use the AWS SDK library directly.  
+   * This is a function to simplify the sending of emails using the AWS SDK.
+   * For more advanced options, use the AWS SDK library directly.
    * See: http://docs.aws.amazon.com/aws-sdk-php-2/guide/latest/service-ses.html
    */
-  private function createSesSendEmailParameterObject($subject, $body, $to, 
-    $from = null) {
+  private function createSesSendEmailParameterObject($subject, $body, $to, $from = null) {
 
     if (!is_array($to)) {
       $to = array($to);

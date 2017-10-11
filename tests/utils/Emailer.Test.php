@@ -20,12 +20,12 @@ class Emailer_Test extends \PHPUnit_Framework_TestCase {
         )
       );'
     );
-    
+
     $configPath = 'root';
     $configRoot = vfsStream::setup($configPath);
     $root = vfsStream::create($sampleConfig, $configRoot);
     $url = vfsStream::url($configPath);
-    
+
     $config = new \Dotslash\Config($url);
 
     try {
@@ -34,7 +34,7 @@ class Emailer_Test extends \PHPUnit_Framework_TestCase {
     } catch (\Exception $e) {}
 
   }
-  
+
   public function test_constructorThrowsExceptionOnMissingAccessKeyVariable() {
     $sampleConfig = array(
       'dotslash-config.php' => '<?php return array(
@@ -47,12 +47,12 @@ class Emailer_Test extends \PHPUnit_Framework_TestCase {
         )
       );'
     );
-    
+
     $configPath = 'root';
     $configRoot = vfsStream::setup($configPath);
     $root = vfsStream::create($sampleConfig, $configRoot);
     $url = vfsStream::url($configPath);
-    
+
     $config = new \Dotslash\Config($url);
 
     try {
@@ -61,7 +61,7 @@ class Emailer_Test extends \PHPUnit_Framework_TestCase {
     } catch (\Exception $e) {}
 
   }
-  
+
   public function test_constructorThrowsExceptionOnMissingSecretKeyVariable() {
     $sampleConfig = array(
       'dotslash-config.php' => '<?php return array(
@@ -74,12 +74,12 @@ class Emailer_Test extends \PHPUnit_Framework_TestCase {
         )
       );'
     );
-    
+
     $configPath = 'root';
     $configRoot = vfsStream::setup($configPath);
     $root = vfsStream::create($sampleConfig, $configRoot);
     $url = vfsStream::url($configPath);
-    
+
     $config = new \Dotslash\Config($url);
 
     try {
@@ -90,24 +90,24 @@ class Emailer_Test extends \PHPUnit_Framework_TestCase {
   }
 
   public function test_email_calls_SES_sendEmail_WithCorrectParams() {
-    
+
     $sampleConfig = array(
       'dotslash-config.php' => '<?php return array(
         "ses-email" => array(
           "aws-access-key" => "iamkey",
-          "aws-secret-key" => "iamkeysecret"
+          "aws-secret-key" => "iamkeysecret",
         ),
         "logging" => array(
           "log-directory" => "/home/user/logs/"
         )
       );'
     );
-    
+
     $configPath = 'root';
     $configRoot = vfsStream::setup($configPath);
     $root = vfsStream::create($sampleConfig, $configRoot);
     $url = vfsStream::url($configPath);
-    
+
     $config = new \Dotslash\Config($url);
 
 
@@ -145,5 +145,4 @@ class Emailer_Test extends \PHPUnit_Framework_TestCase {
     $emailer->email($subject, $body, $to, $from);
 
   }
-
 }
